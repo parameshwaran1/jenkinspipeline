@@ -15,21 +15,35 @@ pipeline {
                 }
             }
         }
-
         stage ('Deployments'){
             parallel{
                 stage ('Deploy to Staging'){
-                    steps {
+                    steps {               
+                       
                        build job :"deploytostaging"
+                       
                     }
                 }
 
                 stage ("Deploy to Production"){
                     steps {
+                       timeout(time:5 , unit:'DAYS'){
+		          input message :"Mohak Approve Production Deployment"
+                       }
                        build job :"deploytoproduction"
+                    }
+                    post{
+                    
+                       success {
+                          echo "Mohak job deployed to production SUCCESS"
+                       }
+                       failure {
+		          echo "Mohak job deployed to production FAILED"
+                       }
                     }
                 }
             }
         }
     }
 }
+
